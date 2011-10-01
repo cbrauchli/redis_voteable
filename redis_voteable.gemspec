@@ -7,11 +7,9 @@ Gem::Specification.new do |s|
   s.version     = RedisVoteable::VERSION
   s.authors     = ["Chris Brauchli"]
   s.email       = ["cbrauchli@gmail.com"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
+  s.homepage    = "http://github.com/cbrauchli"
+  s.summary     = %q{Simple vote management with Redis used as the backend.}
   s.description = %q{TODO: Write a gem description}
-
-  s.rubyforge_project = "redis_voteable"
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
