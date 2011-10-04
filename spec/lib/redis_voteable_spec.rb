@@ -37,9 +37,9 @@ describe "Redis Voteable" do
   end
 
   it "voter should have up vote votings" do
-    @voter.up_vote_count == 0
+    @voter.up_votes == 0
     @voter.up_vote(@voteable)
-    @voter.up_vote_count == 1
+    @voter.up_votes == 1
     @voter.votings[0].should == @voteable
   end
 
@@ -52,10 +52,36 @@ describe "Redis Voteable" do
   end
 
   it "voter should have down vote votings" do
-    @voter.down_vote_count.should == 0
+    @voter.down_votes.should == 0
     @voter.down_vote(@voteable)
-    @voter.down_vote_count.should == 1
+    @voter.down_votes.should == 1
     @voter.votings[0].should == @voteable
+  end
+
+  it "voteable should calculate correct percentages" do
+    @voter.up_vote(@voteable)
+    @voteable.up_percentage.should == 100.0
+    @voteable.down_percentage.should == 0.0
+    @voter2 = VoterModel.create(:name => "Voter 2")
+    @voter2.down_vote(@voteable)
+    @voteable.up_percentage.should == 50.0
+    @voteable.down_percentage.should == 50.0
+  end
+  
+  it "voteable should calculate lower Wilson confidence bound" do
+    @voter2 = VoterModel.create(:name => "Voter 2")
+    @voter3 = VoterModel.create(:name => "Voter 3")
+    @voter4 = VoterModel.create(:name => "Voter 4")
+    @voter.up_vote(@voteable)
+    score1 = @voteable.confidence
+    @voter2.down_vote(@voteable)
+    score2 = @voteable.confidence
+    @voter3.down_vote(@voteable)
+    score3 = @voteable.confidence
+    @voter3.up_vote(@voteable)
+    score4 = @voteable.confidence
+    @voter4.up_vote(@voteable)
+    score5 = @voteable.confidence
   end
 
   describe "up vote" do
@@ -66,9 +92,9 @@ describe "Redis Voteable" do
     end
 
     it "should increase up votes of voter by one" do
-      @voter.up_vote_count.should == 0
+      @voter.up_votes.should == 0
       @voter.up_vote(@voteable)
-      @voter.up_vote_count.should == 1
+      @voter.up_votes.should == 1
     end
 
     it "should only allow a voter to up vote a voteable once" do
@@ -93,15 +119,15 @@ describe "Redis Voteable" do
       @voteable.up_votes.should == 0
       @voteable.down_votes.should == 1
       @voteable.tally.should == -1
-      @voter.up_vote_count.should == 0
-      @voter.down_vote_count.should == 1
+      @voter.up_votes.should == 0
+      @voter.down_votes.should == 1
       
       @voter.up_vote(@voteable)
       @voteable.up_votes.should == 1
       @voteable.down_votes.should == 0
       @voteable.tally.should == 1
-      @voter.up_vote_count.should == 1
-      @voter.down_vote_count.should == 0
+      @voter.up_votes.should == 1
+      @voter.down_votes.should == 0
     end
 
     it "should allow up votes from different voters" do
@@ -133,9 +159,9 @@ describe "Redis Voteable" do
     end
 
     it "should decrease down votes of voter by one" do
-      @voter.down_vote_count.should == 0
+      @voter.down_votes.should == 0
       @voter.down_vote(@voteable)
-      @voter.down_vote_count.should == 1
+      @voter.down_votes.should == 1
     end
 
     it "should only allow a voter to down vote a voteable once" do
@@ -160,15 +186,15 @@ describe "Redis Voteable" do
       @voteable.up_votes.should == 1
       @voteable.down_votes.should == 0
       @voteable.tally.should == 1
-      @voter.up_vote_count.should == 1
-      @voter.down_vote_count.should == 0
+      @voter.up_votes.should == 1
+      @voter.down_votes.should == 0
       
       @voter.down_vote(@voteable)
       @voteable.up_votes.should == 0
       @voteable.down_votes.should == 1
       @voteable.tally.should == -1
-      @voter.up_vote_count.should == 0
-      @voter.down_vote_count.should == 1
+      @voter.up_votes.should == 0
+      @voter.down_votes.should == 1
     end
 
     it "should allow down votes from different voters" do
@@ -196,10 +222,10 @@ describe "Redis Voteable" do
     it "should decrease the up votes if up voted before" do
       @voter.up_vote(@voteable)
       @voteable.up_votes.should == 1
-      @voter.up_vote_count.should == 1
+      @voter.up_votes.should == 1
       @voter.clear_vote(@voteable)
       @voteable.up_votes.should == 0
-      @voter.up_vote_count.should == 0
+      @voter.up_votes.should == 0
     end
 
     it "should raise an error if voter didn't vote for the voteable" do

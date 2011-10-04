@@ -113,17 +113,17 @@ module RedisVoteable
       end
       
       # Return the total number of votes a voter has cast.
-      def vote_count()
-        up_vote_count + down_vote_count
+      def total_votes()
+        up_votes + down_votes
       end
       
       # Returns the number of upvotes a voter has cast.
-      def up_vote_count()
+      def up_votes()
         redis.scard prefixed("#{class_key(self)}:#{UP_VOTES}")
       end
       
       # Returns the number of downvotes a voter has cast.
-      def down_vote_count()
+      def down_votes()
         redis.scard prefixed("#{class_key(self)}:#{DOWN_VOTES}")
       end
       

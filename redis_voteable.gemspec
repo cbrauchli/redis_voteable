@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   
   # Dependencies
   s.add_dependency "redis", "~> 2.2.0"
-  s.add_dependency "activesupport"
+  s.add_dependency "activesupport", ">= 3.0.0"
   
   # For development only
   s.add_development_dependency "activerecord", "~> 3.0.0"

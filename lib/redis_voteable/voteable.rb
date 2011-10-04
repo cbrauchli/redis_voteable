@@ -38,12 +38,12 @@ module RedisVoteable
       end
       
       def up_percentage
-        return (up_votes.to_f * 100 / total_votes) unless votes == 0
+        return (up_votes.to_f * 100 / total_votes) unless total_votes == 0
         nil
       end
       
       def down_percentage
-        return (down_votes.to_f * 100 / total_votes) unless votes == 0
+        return (down_votes.to_f * 100 / total_votes) unless total_votes == 0
         nil
       end
       
