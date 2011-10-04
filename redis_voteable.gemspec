@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.date        = "2011-09-30"
   s.homepage    = "http://github.com/cbrauchli/redis_voteable"
   s.summary     = %q{Simple vote management with Redis used as the backend.}
-  s.description = %q{TODO: Write a gem description}
+  s.description = %q{A Redis-backed voting extension for Rails applications. }
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
