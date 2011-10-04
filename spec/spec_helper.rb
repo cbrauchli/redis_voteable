@@ -30,11 +30,11 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.clean
-    redis = Redis.new
-    redis.flushdb
   end
 
   config.after(:each) do
     DatabaseCleaner.clean
+    #redis = Redis.new
+    #redis.flushdb
   end
 end
