@@ -11,7 +11,7 @@ Installation
 
 Add RedisVoteable to your Gemfile
 
-    gem `redis_voteable`
+    gem 'redis_voteable'
 
 afterwards execute
 
