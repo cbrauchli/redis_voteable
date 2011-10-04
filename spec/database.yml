@@ -1,0 +1,3 @@
+sqlite3:
+  adapter: sqlite3
+  database: redis_voteable.sqlite3
