@@ -40,7 +40,7 @@ describe "Redis Voteable" do
     @voter.up_votes == 0
     @voter.up_vote(@voteable)
     @voter.up_votes == 1
-    @voter.votings[0].should == @voteable
+    @voter.voteables[0].should == @voteable
   end
 
   it "voteable should have down vote votings" do
@@ -55,7 +55,7 @@ describe "Redis Voteable" do
     @voter.down_votes.should == 0
     @voter.down_vote(@voteable)
     @voter.down_votes.should == 1
-    @voter.votings[0].should == @voteable
+    @voter.voteables[0].should == @voteable
   end
 
   it "voteable should calculate correct percentages" do
@@ -149,6 +149,12 @@ describe "Redis Voteable" do
       @voter.up_voted?(@voteable).should be_true
       @voter.down_voted?(@voteable).should be_false
     end
+
+    it "should have up votings" do
+      @voter.up_vote(@voteable)
+      @voter.voteables[0].up_voted?(@voter).should be_true
+      @voter.voteables[0].down_voted?(@voter).should be_false
+    end
   end
 
   describe "down vote" do
@@ -216,6 +222,12 @@ describe "Redis Voteable" do
       @voter.up_voted?(@voteable).should be_false
       @voter.down_voted?(@voteable).should be_true
     end
+
+    it "should have down votings" do
+      @voter.down_vote(@voteable)
+      @voter.voteables[0].up_voted?(@voter).should be_false
+      @voter.voteables[0].down_voted?(@voter).should be_true
+    end
   end
 
   describe "clear_vote" do
@@ -224,6 +236,15 @@ describe "Redis Voteable" do
       @voteable.up_votes.should == 1
       @voter.up_votes.should == 1
       @voter.clear_vote(@voteable)
+      @voteable.up_votes.should == 0
+      @voter.up_votes.should == 0
+    end
+    
+    it "should have working aliases" do
+      @voter.up_vote(@voteable)
+      @voteable.up_votes.should == 1
+      @voter.up_votes.should == 1
+      @voter.unvote(@voteable)
       @voteable.up_votes.should == 0
       @voter.up_votes.should == 0
     end

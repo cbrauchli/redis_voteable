@@ -47,6 +47,29 @@ module RedisVoteable
         nil
       end
       
+      # Returns true if the voter voted on the +voteable+.
+      def voted?(voter)
+        up_voted?(voter) || down_voted?(voter)
+      end
+      
+      # Returns :up, :down, or nil.
+      def vote_value?(voter)
+        return :up   if up_voted?(voter)
+        return :down if down_voted?(voter)
+        return nil
+      end
+      
+      # Returns true if the voter up voted the +voteable+.
+      def up_voted?(voter)
+        redis.sismember prefixed("#{class_key(voter)}:#{UP_VOTES}"), "#{class_key(self)}"
+      end
+
+      # Returns true if the voter down voted the +voteable+.
+      def down_voted?(voter)
+        redis.sismember prefixed("#{class_key(voter)}:#{DOWN_VOTES}"), "#{class_key(self)}"
+      end
+      
+      
       # Returns an array of objects that are +voter+s that voted on this 
       # +voteable+. This method can be very slow, as it constructs each
       # object. Also, it assumes that each object has a +find(id)+ method
@@ -59,7 +82,14 @@ module RedisVoteable
         voters = redis.smembers prefixed("#{class_key(self)}:#{UP_VOTERS}")
         voters.map do |voter|
           tmp = voter.split(':')
-          tmp[0, tmp.length-1].join(':').constantize.find(tmp.last)
+          klass = tmp[0, tmp.length-1].join(':').constantize
+          if klass.respond_to?('find')
+            klass.find(tmp.last)
+          elsif klass.respond_to?('get')
+            klass.get(tmp.last)
+          else
+            nil
+          end
         end
       end
       
@@ -67,7 +97,14 @@ module RedisVoteable
         voters = redis.smembers prefixed("#{class_key(self)}:#{DOWN_VOTERS}")
         voters.map do |voter|
           tmp = voter.split(':')
-          tmp[0, tmp.length-1].join(':').constantize.find(tmp.last)
+          klass = tmp[0, tmp.length-1].join(':').constantize
+          if klass.respond_to?('find')
+            klass.find(tmp.last)
+          elsif klass.respond_to?('get')
+            klass.get(tmp.last)
+          else
+            nil
+          end
         end
       end
       

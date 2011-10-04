@@ -18,10 +18,15 @@ module RedisVoteable
         :host => 'localhost',
         :port => '6379',
         :db => 0,
-        :key_prefix => "vote:",
+        :key_prefix => 'vote:',
   }
+  
+  def redis_voteable_settings=(new_settings)
+    @@redis_voteable_settings.update(new_settings)
+  end
+  
   mattr_accessor :redis
-  @@redis = Redis.new(@@redis_voteable_settings)
+  # @@redis = 
   
   def prefixed(sid)
     "#{@@redis_voteable_settings[:key_prefix]}#{sid}"
@@ -47,6 +52,7 @@ module RedisVoteable
     #   acts_as_voteable
     # end
     def acts_as_voteable 
+      RedisVoteable.redis ||= Redis.new(RedisVoteable.redis_voteable_settings)
       include Voteable
     end
 
@@ -57,6 +63,7 @@ module RedisVoteable
     #   acts_as_voter
     # end
     def acts_as_voter
+      RedisVoteable.redis ||= Redis.new(RedisVoteable.redis_voteable_settings)
       include Voter
     end
   end

@@ -100,7 +100,8 @@ module RedisVoteable
         raise Exceptions::NotVotedError unless r[0] == 1 || r[2] == 1
         true
       end
-
+      alias :unvote :clear_vote
+      
       # Clears an already done vote on a +voteable+, but doesn't raise an error if
       # the voteable was not voted. It ignores the unvote then.
       def clear_vote!(voteable)
@@ -111,6 +112,7 @@ module RedisVoteable
           return false
         end
       end
+      alias :unvote! :clear_vote!
       
       # Return the total number of votes a voter has cast.
       def total_votes()
@@ -153,23 +155,37 @@ module RedisVoteable
       # +voteable+. This method can be very slow, as it constructs each
       # object. Also, it assumes that each object has a +find(id)+ method
       # defined (e.g., any ActiveRecord object).
-      def votings
-        up_votings | down_votings
+      def voteables
+        up_voteables | down_voteables
       end
       
-      def up_votings
-        votings = redis.smembers prefixed("#{class_key(self)}:#{UP_VOTES}")
-        votings.map do |voting|
-          tmp = voting.split(':')
-          tmp[0, tmp.length-1].join(':').constantize.find(tmp.last)
+      def up_voteables
+        voteables = redis.smembers prefixed("#{class_key(self)}:#{UP_VOTES}")
+        voteables.map do |voteable|
+          tmp = voteable.split(':')
+          klass = tmp[0, tmp.length-1].join(':').constantize
+          if klass.respond_to?('find')
+            klass.find(tmp.last)
+          elsif klass.respond_to?('get')
+            klass.get(tmp.last)
+          else
+            nil
+          end
         end
       end
       
-      def down_votings
-        votings = redis.smembers prefixed("#{class_key(self)}:#{DOWN_VOTES}")
-        votings.map do |voting|
-          tmp = voting.split(':')
-          tmp[0, tmp.length-1].join(':').constantize.find(tmp.last)
+      def down_voteables
+        voteables = redis.smembers prefixed("#{class_key(self)}:#{DOWN_VOTES}")
+        voteables.map do |voteable|
+          tmp = voteable.split(':')
+          klass = tmp[0, tmp.length-1].join(':').constantize
+          if klass.respond_to?('find')
+            klass.find(tmp.last)
+          elsif klass.respond_to?('get')
+            klass.get(tmp.last)
+          else
+            nil
+          end
         end
       end
       
