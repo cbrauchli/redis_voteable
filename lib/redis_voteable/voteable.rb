@@ -113,7 +113,9 @@ module RedisVoteable
       # and: http://www.evanmiller.org/how-not-to-sort-by-average-rating.html
       def confidence(bound = :lower)
         #include Math
-        n = up_votes + down_votes
+        up   = up_votes
+        down = down_votes
+        n = up + down
         if n == 0
           return 0 if n == 0
         end
@@ -124,7 +126,7 @@ module RedisVoteable
                                #    1.644853646608357  = 90%
                                #    1.9599639715843482 = 95%
                                #    2.2414027073522136 = 97.5%
-        p_hat = 1.0*up_votes/n
+        p_hat = 1.0*up/n
         left  = p_hat + z*z/(2*n)
         right = z * Math.sqrt( (p_hat*(1-p_hat) + z*z/(4*n)) / n )
         under = 1 + z*z/n
