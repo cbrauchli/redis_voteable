@@ -113,8 +113,9 @@ module RedisVoteable
       # and: http://www.evanmiller.org/how-not-to-sort-by-average-rating.html
       def confidence(bound = :lower)
         #include Math
-        up   = up_votes
-        down = down_votes
+        epsilon = 0.5  # Used for Lidstone smoothing
+        up   = up_votes + epsilon
+        down = down_votes + epsilon
         n = up + down
         if n == 0
           return 0 if n == 0
